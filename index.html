@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js HW 1</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <style>
+        body {
+            font-family: monospace;
+            font-size: 16px;
+            background-color: #0a0a0a;
+            color: #006400;
+            margin: 0;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin: 0 0 50px 0;
+        }
+
+        ul {
+            margin: 5px 0;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .hr {
+            height: 1px;
+            background-color: #006400;
+            margin: 50px 0;
+        }
+
+        .list {
+            display: flex;
+            justify-content: space-between;
+            margin: 0;
+            padding: 0;
+        }
+
+        @media only screen and (max-width: 1023px) {
+            .list {
+                flex-direction: column;
+            }
+        }
+
+        .list_guests {
+            flex-direction: column;
+        }
+
+        .list__item {
+            list-style: none;
+            margin: 10px 0;
+        }
+
+        .list__label {
+            display: block;
+            margin: 0 0 10px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .list__field {
+            background-color: #99b500;
+            color: #006400;
+            font-family: monospace;
+            font-size: 16px;
+            border: 0;
+            outline: none;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        @media only screen and (max-width: 425px) {
+            .list__field {
+                width: 100%;
+            }
+        }
+
+        .form__submit {
+            display: flex;
+            align-items: center;
+            margin: 50px 0 0 0;
+        }
+
+        .form__submit-btn,
+        .form__button {
+            display: block;
+            min-width: 100px;
+            padding: 10px;
+            border: none;
+            color: #99b500;
+            background-color: #006400;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .3s;
+            outline: none;
+        }
+
+        .form__submit-btn:hover,
+        .form__button:hover {
+            color: #006400;
+            background-color: #99b500;
+        }
+
+        .form__button {
+            margin: 50px 0 0 0;
+        }
+
+        .form__error {
+            font-size: 10px;
+            color: red;
+            margin: 0 0 0 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <h2>Задание:</h2>
+    <p>Нужно создать форму c такими полями:</p>
+    <ul>
+        <li>Email</li>
+        <li>First Name</li>
+        <li>Last Name</li>
+        <li>Phone</li>
+    </ul>
+    <p>Кнопка Guests+ позволяет добавлять произвольное количество гостей.</p>
+    <p>Гостя можно удалить двойным кликом по имени гостя.</p>
+    <p>Кнопка Send Data отображает второй экран, на котором выводится вся введенная информация.</p>
+    <p>Форма не должна отправляться, если хоть одно поле пустое.</p>
+    <div class="hr"></div>
+
+    <h2>Решение:</h2>
+
+    <div id="app">
+
+        <form
+                class="form"
+                v-on:submit="submitHandler($event)"
+                v-if="firstScreen"
+
+        >
+
+            <ul class="list">
+                <li class="list__item">
+                    <label for="list__email" class="list__label">Email</label>
+                    <input
+                            type="text"
+                            id="list__email"
+                            class="list__field"
+                            v-model="email"
+                    >
+                </li>
+                <li class="list__item">
+                    <label for="list__f-name" class="list__label">First Name</label>
+                    <input
+                            type="text"
+                            id="list__f-name"
+                            class="list__field"
+                            v-model="fName"
+                    >
+                </li>
+                <li class="list__item">
+                    <label for="list__l-name" class="list__label">Last Name</label>
+                    <input
+                            type="text"
+                            id="list__l-name"
+                            class="list__field"
+                            v-model="lName"
+                    >
+                </li>
+                <li class="list__item">
+                    <label for="list__phone" class="list__label">Phone</label>
+                    <input
+                            type="text"
+                            id="list__phone"
+                            class="list__field"
+                            v-model="phone"
+                    >
+                </li>
+            </ul>
+
+            <button type="button"
+                    class="form__button"
+                    v-on:click="addGuest"
+            >
+                Guests+
+            </button>
+
+            <ul class="list list_guests">
+                <li class="list__item" v-for="(guest, index) in guests">
+                    <label
+                            v-bind:for="'list__guest' + index"
+                            class="list__label"
+                            v-on:dblclick="removeGuest(index)"
+                    >
+                        Guest{{ index + 1 }}
+                    </label>
+                    <input
+                            type="text"
+                            v-bind:id="'list__guest' + index"
+                            class="list__field"
+                            v-model="guests[index]"
+                    >
+                </li>
+            </ul>
+
+            <div class="form__submit">
+                <button type="submit" class="form__submit-btn">Send Data</button>
+                <span class="form__error" v-if="error">Поля не должны быть пустыми</span>
+            </div>
+        </form>
+
+        <div
+                class="summary"
+                v-else
+        >
+            <p>Email: {{ email }}</p>
+            <p>First Name: {{ fName }}</p>
+            <p>Last Name: {{ lName }}</p>
+            <p>Phone: {{ phone }}</p>
+            <p v-for="(guest, index) in guests">Guest{{ index + 1 }}: {{ guest }}</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let sample = new Vue({
+        el: '#app',
+        data: {
+            email: '',
+            fName: '',
+            lName: '',
+            phone: '',
+            guests: [],
+            error: false,
+            firstScreen: true
+        },
+        methods: {
+            addGuest() {
+                this.guests.push('');
+            },
+            removeGuest(index) {
+                this.guests.splice(index, 1);
+            },
+            checkGuest() {
+                for (let i = 0; i < this.guests.length; i++) {if ( this.guests[i] === '' ) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+            submitHandler(e) {
+                e.preventDefault();
+
+                if ( this.email === '' || this.fName === '' || this.lName === '' || this.phone === '' || this.checkGuest() ) {
+                    this.error = true;
+                } else {
+                    this.error = false;
+                    this.firstScreen = false;
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
