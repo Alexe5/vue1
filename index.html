@@ -263,7 +263,8 @@
                 this.guests.splice(index, 1);
             },
             checkGuest() {
-                for (let i = 0; i < this.guests.length; i++) {if ( this.guests[i] === '' ) {
+                for (let i = 0; i < this.guests.length; i++) {
+                    if ( this.guests[i] === '' ) {
                         return true;
                     }
                 }
