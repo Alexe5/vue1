@@ -9,6 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: monospace;
             font-size: 16px;
@@ -98,7 +102,7 @@
         .form__button {
             display: block;
             min-width: 100px;
-            padding: 10px;
+            padding: 10px 5px;
             border: none;
             color: #99b500;
             background-color: #006400;
@@ -276,6 +280,10 @@
                     this.firstScreen = false;
                 }
             }
+        },
+        updated() {
+            let currentHeight = document.body.offsetHeight;
+            window.scrollTo(0, currentHeight);
         }
     });
 </script>
